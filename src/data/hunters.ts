@@ -1,4 +1,4 @@
-import type { Ability, Effect, HunterClass, HunterDef, HunterElement, Kit, Passive, Rarity, Stats } from '../types';
+import type { Ability, Effect, Figure, HunterClass, HunterDef, HunterElement, Kit, Passive, Rarity, Stats } from '../types';
 import { HUNTER } from '../config/balance';
 
 // ---------- tiny effect helpers ----------
@@ -39,7 +39,7 @@ function baseStats(cls: HunterClass, rarity: Rarity, tweak: Partial<Stats> = {})
     hp: Math.round(R_BASE.hp * p.hp * m),
     atk: Math.round(R_BASE.atk * p.atk * m),
     def: Math.round(R_BASE.def * p.def * m),
-    spd: Math.round(R_BASE.spd * p.spd + (rarity === 'SSR' ? 6 : rarity === 'SR' ? 3 : 0)),
+    spd: Math.round(R_BASE.spd * p.spd + (rarity === 'MR' ? 9 : rarity === 'SSR' ? 6 : rarity === 'SR' ? 3 : 0)),
     critRate: p.critRate,
     critDmg: p.critDmg,
   };
@@ -68,6 +68,7 @@ const make = (s: Spec): HunterDef => ({
   title: s.title,
   bio: s.bio,
   rarity: s.rarity,
+  figure: FIGURE[s.id] ?? 'm',
   cls: s.cls,
   element: s.element,
   base: baseStats(s.cls, s.rarity, s.tweak),
@@ -544,7 +545,77 @@ const R2: Spec[] = [
   },
 ];
 
-export const HUNTERS: HunterDef[] = [...SSR, ...SSR2, ...SR, ...SR2, ...R, ...R2].map(make);
+// =========================================================== Mythic (6★)
+const MR: Spec[] = [
+  {
+    id: 'mr-aurelia', name: 'Aurelia Nox', title: 'Eclipse Regent', rarity: 'MR', cls: 'mage', element: 'void',
+    bio: 'Declared dead in the Sundering. She walked out of the first Rift three years later, wearing its dark like a crown.',
+    kit: {
+      basic: ab('Null Verse', 'Deal 110% ATK to one enemy.', [dmg(1.1)]),
+      skill: ab('Event Horizon', '180% ATK to all enemies and lower their DEF by 25%.', [dmg(1.8, 'allEnemies'), debuff('def', 0.25, 'allEnemies')], 3),
+      ultimate: ab('Total Night', '450% ATK to all enemies, +50% vs debuffed; team gains +20% ATK for 2 turns.', [dmg(4.5, 'allEnemies', { bonusVsDebuffed: 0.5 }), buff('atk', 0.2, 'allAllies')]),
+      passives: [
+        pas('Crown of Dark', '+15% ATK.', { stats: { atk: 0.15 } }),
+        pas('Regency', 'Team gains +8% ATK.', { teamStats: { atk: 0.08 } }),
+        pas('Long Eclipse', '+20% ATK, start with 50 energy.', { stats: { atk: 0.2 }, startEnergy: 50 }),
+      ],
+    },
+  },
+  {
+    id: 'mr-caspian', name: 'Caspian Rook', title: 'The Rift-Walker', rarity: 'MR', cls: 'striker', element: 'storm',
+    bio: 'Steps between Rifts the way other people step off a curb. Nobody has seen him use a door in years.',
+    kit: {
+      basic: ab('Blink Strike', 'Hit one enemy for 120% ATK.', [dmg(1.2)]),
+      skill: ab('Phase Cut', '240% ATK to one enemy, ignoring 30% DEF; gain +25% SPD for 2 turns.', [dmg(2.4, 'enemy', { ignoreDef: 0.3 }), buff('spd', 0.25, 'self')], 3),
+      ultimate: ab('Thousand Steps', '6 hits of 110% ATK on random enemies, 30% chance to stun.', [dmg(1.1, 'randomEnemies', { hits: 6 }), stun(0.3, 'allEnemies')]),
+      passives: [
+        pas('Between Places', '+12% SPD.', { stats: { spd: 0.12 } }),
+        pas('Slipstream', 'Team gains +8% SPD.', { teamStats: { spd: 0.08 } }),
+        pas('No Doors', '+20% ATK, +15% Crit Rate.', { stats: { atk: 0.2, critRate: 0.15 } }),
+      ],
+    },
+  },
+  {
+    id: 'mr-saoirse', name: 'Saoirse Vantor', title: 'Heir of the City', rarity: 'MR', cls: 'healer', element: 'radiant',
+    bio: 'Last descendant of the family that founded Vantor. She swore the city would not fall twice.',
+    kit: {
+      basic: ab('Charter Light', 'Deal 100% ATK to one enemy.', [dmg(1.0)]),
+      skill: ab('Founding Light', 'Heal all allies for 160% ATK, cleanse debuffs, shield for 10% max HP.', [heal(1.6, 'allAllies'), cleanse('allAllies'), shield(0.1, 'allAllies')], 3),
+      ultimate: ab('City Unbroken', 'Heal all allies for 260% ATK, +25% ATK for 2 turns, and grant 25 energy.', [heal(2.6, 'allAllies'), buff('atk', 0.25, 'allAllies'), energy(25, 'allAllies')]),
+      passives: [
+        pas('Old Blood', '+15% HP.', { stats: { hp: 0.15 } }),
+        pas('Civic Oath', 'Team gains +10% HP.', { teamStats: { hp: 0.1 } }),
+        pas('Lantern of Vantor', '+20% ATK, start with 40 energy.', { stats: { atk: 0.2 }, startEnergy: 40 }),
+      ],
+    },
+  },
+  {
+    id: 'mr-magnus', name: 'Magnus Hale', title: 'The Unburnt', rarity: 'MR', cls: 'tank', element: 'flame',
+    bio: 'Walked through the Foundry Rift fire to carry out forty workers. The flames have obeyed him ever since.',
+    kit: {
+      basic: ab('Foundry Fist', 'Hit one enemy for 110% ATK.', [dmg(1.1)]),
+      skill: ab('Unburnt Stance', 'Taunt for 2 turns, shield self for 30% max HP, team +15% DEF.', [taunt(2), shield(0.3, 'self'), buff('def', 0.15, 'allAllies')], 3),
+      ultimate: ab('Pyreheart', '200% ATK to all enemies and burn them; shield the team for 20% max HP.', [dmg(2.0, 'allEnemies'), dot(0.4, 'allEnemies'), shield(0.2, 'allAllies')]),
+      passives: [
+        pas('Fireproof', '+18% DEF.', { stats: { def: 0.18 } }),
+        pas('Forty Saved', 'Team gains +10% DEF.', { teamStats: { def: 0.1 } }),
+        pas('Heart of the Forge', '+25% HP, +15% DEF.', { stats: { hp: 0.25, def: 0.15 } }),
+      ],
+    },
+  },
+];
+
+/** Portrait body type per hunter */
+const FIGURE: Record<string, Figure> = {
+  'ssr-isolde': 'f', 'ssr-ren': 'm', 'ssr-mireille': 'f', 'ssr-tavish': 'm', 'ssr-ingrid': 'f', 'ssr-teodor': 'm',
+  'sr-kasimir': 'm', 'sr-yuna': 'f', 'sr-odalys': 'f', 'sr-jabari': 'm', 'sr-petra': 'f', 'sr-sable': 'f', 'sr-goran': 'm', 'sr-lumi': 'f',
+  'sr-mara': 'f', 'sr-kip': 'm', 'sr-augustin': 'm', 'sr-elodie': 'f',
+  'r-brann': 'm', 'r-cole': 'm', 'r-wren': 'f', 'r-tamsin': 'f', 'r-dace': 'm', 'r-vesna': 'f', 'r-ilse': 'f', 'r-pim': 'm', 'r-hob': 'm',
+  'r-orrin': 'm', 'r-ama': 'f', 'r-saffi': 'f', 'r-benny': 'm', 'r-juno': 'f', 'r-dorrit': 'f', 'r-pell': 'm', 'r-wynn': 'm', 'r-ossie': 'm',
+  'mr-aurelia': 'f', 'mr-caspian': 'm', 'mr-saoirse': 'f', 'mr-magnus': 'm',
+};
+
+export const HUNTERS: HunterDef[] = [...MR, ...SSR, ...SSR2, ...SR, ...SR2, ...R, ...R2].map(make);
 export const HUNTER_MAP: Record<string, HunterDef> = Object.fromEntries(HUNTERS.map((h) => [h.id, h]));
 export const getHunter = (id: string): HunterDef => {
   const h = HUNTER_MAP[id];

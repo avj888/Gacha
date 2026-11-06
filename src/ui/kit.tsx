@@ -8,7 +8,7 @@ import { useUi } from '../store/uiStore';
 import type { Element, Rarity } from '../types';
 import { sfx } from '../audio/sfx';
 import { haptic } from '../fx/haptics';
-import { ELEMENT_COLOR, ELEMENT_LABEL, RARITY_COLOR, fmt } from './meta';
+import { ELEMENT_COLOR, ELEMENT_LABEL, MYTHIC_GRADIENT, RARITY_COLOR, RARITY_LABEL, fmt } from './meta';
 import s from './ui.module.css';
 
 type BtnProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -67,8 +67,11 @@ export function ElementTag({ element }: { element: Element }) {
 
 export function RarityTag({ rarity }: { rarity: Rarity }) {
   return (
-    <span className={s.tag} style={{ color: RARITY_COLOR[rarity] }}>
-      {rarity}
+    <span
+      className={s.tag}
+      style={rarity === 'MR' ? { color: '#fff', borderColor: 'transparent', background: MYTHIC_GRADIENT } : { color: RARITY_COLOR[rarity] }}
+    >
+      {RARITY_LABEL[rarity]}
     </span>
   );
 }

@@ -44,6 +44,17 @@ describe('save system', () => {
     expect(fixed.stats.playMs).toBe(0);
   });
 
+  it('migrates v1 saves to v2 (Mythic spark counter, avatar)', () => {
+    const v1 = defaultSave(1) as Record<string, any>;
+    v1.version = 1;
+    delete v1.settings.avatar;
+    v1.gacha.banners.featured = { pity: 42, srPity: 3, guaranteedFeatured: true, totalPulls: 99 };
+    const s = migrate(v1);
+    expect(s.version).toBe(2);
+    expect(s.gacha.banners.featured).toEqual({ pity: 42, srPity: 3, guaranteedFeatured: true, totalPulls: 99, mrPity: 0 });
+    expect(s.settings.avatar).toBe('m');
+  });
+
   it('refuses saves from the future', () => {
     expect(() => migrate({ ...defaultSave(1), version: 999 })).toThrow(/newer/);
   });

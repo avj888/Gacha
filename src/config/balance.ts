@@ -52,7 +52,11 @@ export const STAMINA = {
 export const GACHA = {
   costSingle: 160,
   costTen: 1600,
-  baseRates: { SSR: 0.01, SR: 0.08, R: 0.91 } as Record<Rarity, number>,
+  baseRates: { SSR: 0.01, SR: 0.08, R: 0.91 } as Record<'SSR' | 'SR' | 'R', number>,
+  /** each SSR-tier result upgrades to Mythic (6★) with this chance */
+  mythicShare: 0.1,
+  /** spark: the Nth SSR-tier result without a Mythic is guaranteed Mythic */
+  mythicSparkAt: 10,
   /** from this pull number (since last SSR, 1-based) the SSR rate starts increasing */
   softPityStart: 66,
   /** added to SSR rate per pull from softPityStart onwards (pull 66 = base + 1 step) */
@@ -70,7 +74,7 @@ export const GACHA = {
   /** featured banner rotation period */
   rotationDays: 7,
   /** dupes beyond max stars convert into this many crystals */
-  overflowDupeCrystals: { R: 20, SR: 80, SSR: 400 } as Record<Rarity, number>,
+  overflowDupeCrystals: { R: 20, SR: 80, SSR: 400, MR: 800 } as Record<Rarity, number>,
 };
 
 // ---------------------------------------------------------------- Hunters
@@ -95,7 +99,7 @@ export const HUNTER = {
   /** ascension cost: mats of the hunter's element and gold */
   ascensionMats: [4, 8, 14, 22, 32, 45],
   ascensionGold: [4000, 10000, 22000, 40000, 70000, 110000],
-  rarityStatMult: { R: 1, SR: 1.18, SSR: 1.4 } as Record<Rarity, number>,
+  rarityStatMult: { R: 1, SR: 1.18, SSR: 1.4, MR: 1.62 } as Record<Rarity, number>,
 };
 
 // ---------------------------------------------------------------- Elements
@@ -201,7 +205,7 @@ export const QUESTS = {
 
 export const SAVE = {
   key: 'riftborn.save',
-  version: 1,
+  version: 2,
   exportPrefix: 'RIFT1',
   debounceMs: 400,
 };

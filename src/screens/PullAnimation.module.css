@@ -52,3 +52,7 @@
   font-family: var(--font-display); font-weight: 900; letter-spacing: .3em; font-size: 14px; color: var(--glow);
   text-shadow: 0 0 20px var(--glow); opacity: 0; animation: rays .6s 1.2s forwards;
 }
+
+/* Mythic: the light cycles through every colour */
+.mythic { animation: hue 2.2s linear infinite; }
+@keyframes hue { from { filter: hue-rotate(0deg) saturate(1.4); } to { filter: hue-rotate(360deg) saturate(1.4); } }

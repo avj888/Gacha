@@ -13,18 +13,20 @@ const prefersReduced = () => typeof matchMedia === 'function' && matchMedia('(pr
 export function PullAnimation({ outcome, onClose }: { outcome: PullOutcome; onClose: () => void }) {
   const motion = useGame((g) => g.save.settings.reducedMotion);
   const reduced = motion === 'on' || (motion === 'system' && prefersReduced());
-  const best = outcome.results.some((r) => r.rarity === 'SSR') ? 'SSR' : outcome.results.some((r) => r.rarity === 'SR') ? 'SR' : 'R';
+  const has = (r: string) => outcome.results.some((x) => x.rarity === r);
+  const best = has('MR') ? 'MR' : has('SSR') ? 'SSR' : has('SR') ? 'SR' : 'R';
+  const top = best === 'MR' || best === 'SSR';
   const [phase, setPhase] = useState<'gate' | 'flash' | 'reveal'>(reduced ? 'reveal' : 'gate');
 
   useEffect(() => {
     if (phase === 'reveal') {
-      sfx(best === 'SSR' ? 'pullSSR' : best === 'SR' ? 'pullSR' : 'pullR');
-      if (best === 'SSR') haptic('ssr');
+      sfx(top ? 'pullSSR' : best === 'SR' ? 'pullSR' : 'pullR');
+      if (top) haptic('ssr');
       return;
     }
     if (phase === 'gate') {
       sfx('gate');
-      const t = setTimeout(() => setPhase('flash'), best === 'SSR' ? 2100 : 1700);
+      const t = setTimeout(() => setPhase('flash'), best === 'MR' ? 2700 : best === 'SSR' ? 2100 : 1700);
       return () => clearTimeout(t);
     }
     const t = setTimeout(() => setPhase('reveal'), 380);
@@ -35,7 +37,7 @@ export function PullAnimation({ outcome, onClose }: { outcome: PullOutcome; onCl
 
   return (
     <div
-      className={s.stage}
+      className={`${s.stage} ${best === 'MR' ? s.mythic : ''}`}
       style={{ ['--glow' as string]: RARITY_COLOR[best] }}
       onClick={() => setPhase('reveal')}
       role="dialog"
@@ -44,7 +46,7 @@ export function PullAnimation({ outcome, onClose }: { outcome: PullOutcome; onCl
       <div className={s.ring} />
       <div className={`${s.ring} ${s.ring2}`} />
       <div className={s.rays} />
-      {best === 'SSR' ? <div className={s.ssrText}>RIFT RESONANCE</div> : null}
+      {top ? <div className={s.ssrText}>{best === 'MR' ? 'MYTHIC CONVERGENCE' : 'RIFT RESONANCE'}</div> : null}
       <div className={s.gate}>
         <div className={s.light} />
         <div className={s.crack} />
