@@ -72,6 +72,8 @@ export interface BattleState {
   outcome: Outcome | null;
   rng: number;
   actions: number;
+  /** ultimates cast by allies (for quests) */
+  allyUlts: number;
   uidCounter: number;
 }
 

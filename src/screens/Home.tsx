@@ -1,5 +1,11 @@
 import { PLAYER } from '../config/balance';
 import { xpToNext, nextRank } from '../engine/progression';
+import { frontierGate, questsClaimable, staminaNow, trialAvailable } from '../engine/game';
+import { trialInfo } from '../data/trials';
+import { STAMINA } from '../config/balance';
+import type { Rank } from '../types';
+import { QuestRow } from './Quests';
+import { Button, useNow } from '../ui/kit';
 import { navigate } from '../store/router';
 import { useGame } from '../store/gameStore';
 import { Bar, CurrencyBar, IconBtnClass, Panel, SystemPanel } from '../ui/kit';
@@ -10,6 +16,22 @@ export function Home() {
   const p = save.player;
   const nr = nextRank(p.rank);
   const owned = Object.keys(save.hunters).length;
+  const now = useNow(30_000);
+  const tr = trialAvailable(save);
+  const claimable = questsClaimable(save);
+  const front = frontierGate(save);
+  const stamina = staminaNow(save, now);
+  const msg = tr
+    ? `Rank trial ready. Defeat ${trialInfo(tr as Exclude<Rank, 'E'>).name} to ascend to ${tr}-Rank.`
+    : claimable
+      ? `${claimable} directive${claimable > 1 ? 's' : ''} complete. Claim your reward.`
+      : save.stats.gatesCleared === 0
+        ? 'Welcome, Awakened. You are the lowest rank in Vantor, and the Rifts know it. Recruit hunters, then enter Gate E-1.'
+        : stamina >= STAMINA.max
+          ? 'Stamina is full. A hunter who rests does not rise.'
+          : front && !save.gates[front.id]?.cleared
+            ? `Next target: Gate ${front.id}, ${front.name}.`
+            : 'Strengthen your hunters and push deeper.';
   return (
     <div className={s.stack}>
       <div className={s.homeTop}>
@@ -35,9 +57,9 @@ export function Home() {
         </div>
       </Panel>
       <SystemPanel title="SYSTEM // LATTICE">
-        <p style={{ fontSize: 14 }}>
-          Welcome, Awakened. You are the lowest rank in Vantor, and the Rifts know it. Recruit hunters at the Summon terminal.
-        </p>
+        <p style={{ fontSize: 14, marginBottom: 8 }}>{msg}</p>
+        {tr ? <Button variant="primary" block onClick={() => navigate('gates')}>Go to Trial</Button> : null}
+        {save.quests.daily.map((q) => <QuestRow key={q.id} q={q} />)}
       </SystemPanel>
       <div className={s.quick}>
         <button type="button" className={s.quickBtn} onClick={() => navigate('gates')}>

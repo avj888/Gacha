@@ -8,9 +8,13 @@ import { Summon } from './screens/Summon';
 import { Roster } from './screens/Roster';
 import { HunterDetail } from './screens/HunterDetail';
 import { Settings } from './screens/Settings';
-import { Placeholder } from './screens/Placeholder';
 import { Battle } from './screens/Battle';
 import { Gates } from './screens/Gates';
+import { Team } from './screens/Team';
+import { Quests } from './screens/Quests';
+import { HunterUpgrade } from './screens/HunterUpgrade';
+import { questsClaimable, trialAvailable } from './engine/game';
+import './store/battleFlow';
 
 const NAV: { name: RouteName; label: string; icon: ReactNode }[] = [
   { name: 'home', label: 'HOME', icon: <path d="M3 11 L12 3 L21 11 V21 H14 V15 H10 V21 H3Z" /> },
@@ -22,6 +26,8 @@ const NAV: { name: RouteName; label: string; icon: ReactNode }[] = [
 
 function NavBar({ current }: { current: RouteName }) {
   const active = current === 'hunter' || current === 'team' ? 'roster' : current;
+  const save = useGame((g) => g.save);
+  const badges: Partial<Record<RouteName, boolean>> = { quests: questsClaimable(save) > 0, gates: !!trialAvailable(save) };
   return (
     <nav className={s.nav} aria-label="Main">
       {NAV.map((n) => (
@@ -30,6 +36,7 @@ function NavBar({ current }: { current: RouteName }) {
             {n.icon}
           </svg>
           {n.label}
+          {badges[n.name] ? <span className={s.badge} aria-label="new" /> : null}
         </button>
       ))}
     </nav>
@@ -39,6 +46,18 @@ function NavBar({ current }: { current: RouteName }) {
 export default function App() {
   const route = useRoute();
   const motion = useGame((g) => g.save.settings.reducedMotion);
+  const tick = useGame((g) => g.tick);
+
+  useEffect(() => {
+    tick();
+    const t = setInterval(tick, 30_000);
+    const onVis = () => document.visibilityState === 'visible' && tick();
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [tick]);
 
   useEffect(() => {
     const el = document.documentElement;
@@ -51,11 +70,11 @@ export default function App() {
   switch (route.name) {
     case 'summon': screen = <Summon />; break;
     case 'roster': screen = <Roster />; break;
-    case 'hunter': screen = <HunterDetail id={route.param ?? ''} />; break;
+    case 'hunter': screen = <HunterDetail id={route.param ?? ''}><HunterUpgrade id={route.param ?? ''} /></HunterDetail>; break;
     case 'settings': screen = <Settings />; break;
     case 'gates': screen = <Gates />; break;
-    case 'quests': screen = <Placeholder title="Quests" phase={3} />; break;
-    case 'team': screen = <Placeholder title="Team" phase={3} />; break;
+    case 'quests': screen = <Quests />; break;
+    case 'team': screen = <Team />; break;
     case 'battle': screen = <Battle />; break;
     default: screen = <Home />;
   }

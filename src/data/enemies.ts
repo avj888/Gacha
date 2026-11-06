@@ -120,12 +120,17 @@ function bossKit(b: string, s: string, u: string, el: HunterElement): UnitKit {
 
 export function enemyStats(g: number, shape: Partial<Stats> = {}, mult = 1): Stats {
   const b = GATES.enemyBase;
-  const f = (1 + GATES.enemyGrowth * Math.pow(g, GATES.enemyGrowthExp)) * mult;
+  const tier = Math.min(5, Math.floor(g / GATES.perTier));
+  const inTier = g - tier * GATES.perTier;
+  const lo = GATES.tierLevels[tier];
+  const hi = GATES.tierLevels[tier + 1];
+  const lvl = lo + (hi - lo) * (inTier / GATES.perTier) * GATES.levelBandUse;
+  const f = (1 + GATES.enemyGrowth * (lvl - 1)) * (1 + GATES.enemyTierBonus * tier) * (1 + GATES.enemyGateRamp * inTier) * mult;
   return {
     hp: Math.round(b.hp * f * (shape.hp ?? 1)),
     atk: Math.round(b.atk * f * (shape.atk ?? 1)),
     def: Math.round(b.def * Math.pow(f, GATES.enemyDefExp) * (shape.def ?? 1)),
-    spd: Math.round((b.spd + g * 0.35) * (shape.spd ?? 1)),
+    spd: Math.round((b.spd + g * 0.3) * (shape.spd ?? 1)),
     critRate: b.critRate + Math.min(0.15, g * 0.003),
     critDmg: b.critDmg,
   };

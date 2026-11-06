@@ -16,12 +16,15 @@ export interface BattleSession {
   state: BattleState;
   initialEvents: BattleEvent[];
   startedAt: number;
+  /** resolved result view (set once so rewards are never granted twice) */
+  result?: unknown;
 }
 
 interface BattleStore {
   session: BattleSession | null;
   start: (opts: Omit<BattleSession, 'state' | 'initialEvents' | 'startedAt'> & { setup: BattleSetup }) => void;
   setState: (s: BattleState) => void;
+  setResult: (r: unknown) => void;
   clear: () => void;
 }
 
@@ -35,6 +38,10 @@ export const useBattle = create<BattleStore>((set, get) => ({
   setState: (state) => {
     const s = get().session;
     if (s) set({ session: { ...s, state } });
+  },
+  setResult: (result) => {
+    const s = get().session;
+    if (s) set({ session: { ...s, result } });
   },
   clear: () => set({ session: null }),
 }));

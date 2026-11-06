@@ -22,7 +22,7 @@ export const PLAYER = {
   /** crystal bonus for each rank-up */
   rankUpCrystals: 480,
   /** stamina granted on each player level up */
-  levelUpStamina: 60,
+  levelUpStamina: 40,
   /** player base stats at level 1, and per-level growth (fraction of base) */
   base: { hp: 1100, atk: 110, def: 70, spd: 102, critRate: 0.1, critDmg: 0.5 },
   growthPerLevel: 0.07,
@@ -144,21 +144,31 @@ export const GATES = {
   redGateChance: 0.05,
   redGateRewardMult: 3,
   redGateStatMult: 1.45,
-  /** enemy stat scaling by global gate index g (0..59) */
-  enemyBase: { hp: 700, atk: 70, def: 45, spd: 92, critRate: 0.05, critDmg: 0.5 },
-  enemyGrowth: 0.165,
-  enemyGrowthExp: 1.12,
+  redGateCrystals: 30,
+  /** enemy stat scaling: gate n of a tier is tuned for a player level inside that tier's band
+   *  (tier start level -> next trial level), scaled by levelBandUse so frontier gates stay beatable */
+  enemyBase: { hp: 440, atk: 58, def: 40, spd: 92, critRate: 0.05, critDmg: 0.5 },
+  tierLevels: [1, 10, 25, 45, 70, 90, 100],
+  levelBandUse: 0.8,
+  /** per expected level, fraction of base (mirrors hunter growth) */
+  enemyGrowth: 0.07,
+  /** multiplicative bonus per tier (mirrors ascension / limit break / rank growth on the player side) */
+  enemyTierBonus: 0.18,
+  /** small ramp inside a tier, per gate */
+  enemyGateRamp: 0.025,
   /** enemy DEF grows as f^enemyDefExp (keeps the DEF formula from flattening damage late) */
-  enemyDefExp: 0.8,
+  enemyDefExp: 0.6,
   bossHpMult: 3.2,
   bossAtkMult: 1.25,
   /** rewards: per stamina point spent */
-  goldPerStamina: 55,
-  essencePerStamina: 6,
+  goldPerStamina: 40,
+  essencePerStamina: 8,
   /** player xp per clear = xpBase * (g+1)^xpExp */
-  xpBase: 120,
-  xpExp: 1.42,
+  xpBase: 23,
+  xpExp: 1.35,
   firstClearXpMult: 2,
+  /** sweeps grant full gold/essence/mats but reduced player XP — the Awakened grows by fighting */
+  sweepXpMult: 0.5,
   /** crystals for first clear and first 3★, by tier */
   firstClearCrystals: { E: 30, D: 40, C: 50, B: 60, A: 70, S: 80 } as Record<Rank, number>,
   threeStarCrystals: { E: 20, D: 25, C: 30, B: 35, A: 40, S: 50 } as Record<Rank, number>,

@@ -23,9 +23,15 @@ interface Float {
 let floatId = 1;
 
 export function Battle() {
+  const id = useBattle((b) => b.session?.startedAt ?? 0);
+  return <BattleView key={id} />;
+}
+
+function BattleView() {
   const session = useBattle((b) => b.session);
   const setBattleState = useBattle((b) => b.setState);
   const clearBattle = useBattle((b) => b.clear);
+  const setBattleResult = useBattle((b) => b.setResult);
   const settings = useGame((g) => g.save.settings);
   const update = useGame((g) => g.update);
 
@@ -38,7 +44,7 @@ export function Battle() {
   const [actionName, setActionName] = useState<{ id: number; text: string; ult: boolean } | null>(null);
   const [target, setTarget] = useState<string | undefined>();
   const [ready, setReady] = useState(true);
-  const [result, setResult] = useState<BattleResultView | null>(null);
+  const [result, setResult] = useState<BattleResultView | null>((useBattle.getState().session?.result as BattleResultView) ?? null);
   const [confirmRetreat, setConfirmRetreat] = useState(false);
   const lastUlt = useRef(false);
   const auto = settings.auto;
@@ -150,12 +156,14 @@ export function Battle() {
     if (!session || !state) return;
     if (state.outcome) {
       const t = setTimeout(() => {
-        setResult(
-          resolveBattle(session, [
-            { label: 'Continue', variant: 'primary', run: () => { clearBattle(); navigate('gates', undefined, true); } },
-          ]),
-        );
-      }, 900 * speed);
+        const cur = useBattle.getState().session;
+        if (!cur) return;
+        const view = resolveBattle(cur, [
+          { label: 'Continue', variant: 'primary', run: () => { clearBattle(); navigate('gates', undefined, true); } },
+        ]);
+        setBattleResult(view);
+        setResult(view);
+      }, session.result ? 0 : 900 * speed);
       return () => clearTimeout(t);
     }
     if (!active || !ready) return;
@@ -163,7 +171,7 @@ export function Battle() {
       const t = setTimeout(() => runStep({ kind: 'auto' }), 380 * speed);
       return () => clearTimeout(t);
     }
-  }, [session, state, active, auto, ready, runStep, speed, clearBattle]);
+  }, [session, state, active, auto, ready, runStep, speed, clearBattle, setBattleResult]);
 
   const order = useMemo(() => (state ? previewOrder(state, BATTLE.timelinePreview) : []), [state]);
 
@@ -354,7 +362,21 @@ export function Battle() {
           </div>
           <div className={s.resActions}>
             {result.actions.map((a, i) => (
-              <Button key={i} variant={a.variant ?? 'ghost'} block onClick={a.run}>{a.label}</Button>
+              <Button
+                key={a.label + i}
+                variant={a.variant ?? 'ghost'}
+                block
+                onClick={() => {
+                  a.run();
+                  if (a.once) {
+                    const next = { ...result, actions: result.actions.filter((x) => x !== a) };
+                    setResult(next);
+                    setBattleResult(next);
+                  }
+                }}
+              >
+                {a.label}
+              </Button>
             ))}
           </div>
         </div>

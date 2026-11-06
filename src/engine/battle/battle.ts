@@ -69,6 +69,7 @@ export function createBattle(setup: BattleSetup): { state: BattleState; events: 
     outcome: null,
     rng: setup.seed >>> 0,
     actions: 0,
+    allyUlts: 0,
     uidCounter: enemies.length,
   };
   const events: BattleEvent[] = [{ t: 'wave', wave: 1 }];
@@ -328,7 +329,10 @@ function useAbility(s: BattleState, u: Unit, kind: AbilityKind, targetUid: strin
     u.energy = Math.min(BATTLE.energyMax, u.energy + BATTLE.energyOnSkill);
     u.cd = ab.cooldown ?? 0;
   }
-  if (kind === 'ultimate') u.energy = 0;
+  if (kind === 'ultimate') {
+    u.energy = 0;
+    if (u.side === 'ally') s.allyUlts += 1;
+  }
 }
 
 // ------------------------------------------------------------ turn flow

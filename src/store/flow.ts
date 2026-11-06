@@ -10,7 +10,7 @@ export interface BattleResultView {
   kos: number;
   lines: { label: string; value: ReactNode }[];
   notes: string[];
-  actions: { label: string; variant?: 'primary' | 'gold' | 'ghost' | 'danger'; run: () => void }[];
+  actions: { label: string; variant?: 'primary' | 'gold' | 'ghost' | 'danger'; once?: boolean; run: () => void }[];
 }
 
 type Resolver = (session: BattleSession) => BattleResultView;
@@ -20,6 +20,7 @@ let resolver: Resolver | null = null;
 export const registerBattleResolver = (r: Resolver) => (resolver = r);
 
 export function resolveBattle(session: BattleSession, fallbackActions: BattleResultView['actions']): BattleResultView {
+  if (session.result) return session.result as BattleResultView;
   if (resolver) return resolver(session);
   const s = battleSummary(session.state);
   return { win: s.win, stars: s.stars, showStars: true, rounds: s.rounds, kos: s.kos, lines: [], notes: [], actions: fallbackActions };
