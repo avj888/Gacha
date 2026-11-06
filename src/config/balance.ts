@@ -110,7 +110,8 @@ export const ELEMENT_ADVANTAGE: Record<Element, Element[]> = {
   rift: [],
 };
 
-export const ELEMENT_MOD = { advantage: 1.3, disadvantage: 0.85, neutral: 1 };
+/** spec: +30% on advantage; no penalty on disadvantage (tunable) */
+export const ELEMENT_MOD = { advantage: 1.3, disadvantage: 1, neutral: 1 };
 
 export const ELEMENTS: HunterElement[] = ['flame', 'frost', 'storm', 'void', 'radiant'];
 
@@ -147,6 +148,8 @@ export const GATES = {
   enemyBase: { hp: 700, atk: 70, def: 45, spd: 92, critRate: 0.05, critDmg: 0.5 },
   enemyGrowth: 0.165,
   enemyGrowthExp: 1.12,
+  /** enemy DEF grows as f^enemyDefExp (keeps the DEF formula from flattening damage late) */
+  enemyDefExp: 0.8,
   bossHpMult: 3.2,
   bossAtkMult: 1.25,
   /** rewards: per stamina point spent */

@@ -9,6 +9,8 @@ import { Roster } from './screens/Roster';
 import { HunterDetail } from './screens/HunterDetail';
 import { Settings } from './screens/Settings';
 import { Placeholder } from './screens/Placeholder';
+import { Battle } from './screens/Battle';
+import { Gates } from './screens/Gates';
 
 const NAV: { name: RouteName; label: string; icon: ReactNode }[] = [
   { name: 'home', label: 'HOME', icon: <path d="M3 11 L12 3 L21 11 V21 H14 V15 H10 V21 H3Z" /> },
@@ -51,10 +53,10 @@ export default function App() {
     case 'roster': screen = <Roster />; break;
     case 'hunter': screen = <HunterDetail id={route.param ?? ''} />; break;
     case 'settings': screen = <Settings />; break;
-    case 'gates': screen = <Placeholder title="Gates" phase={3} />; break;
+    case 'gates': screen = <Gates />; break;
     case 'quests': screen = <Placeholder title="Quests" phase={3} />; break;
     case 'team': screen = <Placeholder title="Team" phase={3} />; break;
-    case 'battle': screen = <Placeholder title="Battle" phase={2} />; break;
+    case 'battle': screen = <Battle />; break;
     default: screen = <Home />;
   }
 
