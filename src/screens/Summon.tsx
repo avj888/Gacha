@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Portrait } from '../art/Portrait';
 import { GACHA } from '../config/balance';
 import { getHunter } from '../data/hunters';
-import { effectiveSsrRate, getBanners, rotationEndsAt } from '../engine/gacha';
+import { effectiveSsrRate, getBanners, mythicShareOfTop, rotationEndsAt } from '../engine/gacha';
 import { useGame, type PullOutcome } from '../store/gameStore';
 import { toast } from '../store/uiStore';
 import { Button, CrystalIcon, CurrencyBar, ElementTag, Modal, Panel, ScreenHead, Stars, useNow } from '../ui/kit';
@@ -82,7 +82,7 @@ export function Summon() {
           </div>
         </div>
         <div className={s.stat}>
-          <div className={s.statLabel}>{isBeginner ? 'PULLS LEFT' : 'NEXT SSR'}</div>
+          <div className={s.statLabel}>{isBeginner ? 'PULLS LEFT' : 'NEXT SSR'} · MYTHIC {GACHA.mythicSparkAt - (bs.mrPity ?? 0)}</div>
           <div className={s.statValue} style={{ fontSize: 13 }}>
             {isBeginner ? `${Math.max(0, beginnerLeft)}` : bs.guaranteedFeatured ? <span style={{ color: 'var(--gold)' }}>Featured guaranteed</span> : '50/50 featured'}
           </div>
@@ -110,6 +110,7 @@ export function Summon() {
       <Modal open={info === 'rates'} onClose={() => setInfo(null)} label="Rates">
         <h3 style={{ marginBottom: 10 }}>Summon Rates</h3>
         <div className={s.rates}>
+          <span style={{ color: RARITY_COLOR.MR }}>Mythic (6★)</span><span className="num">≈{pct(effectiveSsrRate() * mythicShareOfTop(), 2)}</span>
           <span style={{ color: RARITY_COLOR.SSR }}>SSR (5★)</span><span className="num">{pct(GACHA.baseRates.SSR)}</span>
           <span style={{ color: RARITY_COLOR.SR }}>SR (4★)</span><span className="num">{pct(GACHA.baseRates.SR)}</span>
           <span style={{ color: RARITY_COLOR.R }}>R (3★)</span><span className="num">{pct(GACHA.baseRates.R)}</span>
@@ -119,6 +120,7 @@ export function Summon() {
           <p className="dim" style={{ fontSize: 13 }}>
             From pull {GACHA.softPityStart} since your last SSR, the SSR rate rises by {GACHA.softPityStep * 100} percentage points per pull. Pull {GACHA.hardPity} is a guaranteed SSR.
             On the featured banner, each SSR has a {GACHA.featuredChance * 100}% chance to be the featured hunter. If it isn't, your next SSR is guaranteed to be featured.
+            Every SSR-tier result has a {GACHA.mythicShare * 100}% chance to ascend to Mythic (6★). Your {GACHA.mythicSparkAt}th SSR-tier result without a Mythic is guaranteed Mythic. A Mythic doesn't use up the 50/50.
             Duplicates add Limit Break stars (max 5). Extra copies after that convert to Crystals.
           </p>
         </Panel>

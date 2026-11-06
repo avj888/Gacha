@@ -2,7 +2,9 @@ export type Element = 'flame' | 'frost' | 'storm' | 'void' | 'radiant' | 'rift';
 export type HunterElement = Exclude<Element, 'rift'>;
 export type HunterClass = 'striker' | 'assassin' | 'ranger' | 'mage' | 'tank' | 'healer';
 export type UnitClass = HunterClass | 'awakened' | 'beast' | 'boss';
-export type Rarity = 'R' | 'SR' | 'SSR';
+/** MR = Mythic (6★), above SSR */
+export type Rarity = 'R' | 'SR' | 'SSR' | 'MR';
+export type Figure = 'f' | 'm';
 export type Rank = 'E' | 'D' | 'C' | 'B' | 'A' | 'S';
 
 export type StatKey = 'hp' | 'atk' | 'def' | 'spd' | 'critRate' | 'critDmg';
@@ -64,6 +66,8 @@ export interface HunterDef {
   title: string;
   bio: string;
   rarity: Rarity;
+  /** portrait body type */
+  figure: Figure;
   cls: HunterClass;
   element: HunterElement;
   /** level 1 base stats */

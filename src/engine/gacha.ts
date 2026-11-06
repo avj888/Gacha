@@ -13,6 +13,8 @@ export interface BannerState {
   /** next SSR is guaranteed to be the featured hunter (lost the previous 50/50) */
   guaranteedFeatured: boolean;
   totalPulls: number;
+  /** SSR-tier results since the last Mythic (spark counter) */
+  mrPity: number;
 }
 
 export interface BannerDef {
@@ -32,7 +34,7 @@ export interface PullResult {
   lostFiftyFifty?: boolean;
 }
 
-export const emptyBannerState = (): BannerState => ({ pity: 0, srPity: 0, guaranteedFeatured: false, totalPulls: 0 });
+export const emptyBannerState = (): BannerState => ({ pity: 0, srPity: 0, guaranteedFeatured: false, totalPulls: 0, mrPity: 0 });
 
 /** SSR probability for the n-th pull since the last SSR (1-based). */
 export function ssrRateAt(n: number): number {
@@ -43,7 +45,17 @@ export function ssrRateAt(n: number): number {
   return GACHA.baseRates.SSR;
 }
 
-/** Exact long-run SSR rate given the pity curve: 1 / E[pulls per SSR]. */
+/** Long-run fraction of SSR-tier results that are Mythic (share per SSR + spark). */
+export function mythicShareOfTop(): number {
+  const p = GACHA.mythicShare;
+  const k = GACHA.mythicSparkAt;
+  let e = 0;
+  for (let i = 1; i < k; i++) e += i * p * Math.pow(1 - p, i - 1);
+  e += k * Math.pow(1 - p, k - 1);
+  return 1 / e;
+}
+
+/** Exact long-run SSR-tier rate (SSR + Mythic) given the pity curve: 1 / E[pulls per SSR-tier]. */
 export function effectiveSsrRate(): number {
   let survive = 1;
   let expected = 0;
@@ -55,8 +67,9 @@ export function effectiveSsrRate(): number {
   return 1 / expected;
 }
 
+/** Rolls the base tier (R / SR / SSR). Mythic is decided afterwards as an SSR upgrade. */
 export function rollRarity(pityAt: number, rng: Rng, floor?: Rarity): Rarity {
-  if (floor === 'SSR') return 'SSR';
+  if (floor === 'SSR' || floor === 'MR') return 'SSR';
   const pSsr = ssrRateAt(pityAt);
   const r = rng.next();
   if (r < pSsr) return 'SSR';
@@ -76,6 +89,14 @@ export function pullOne(state: BannerState, banner: BannerDef, rng: Rng, floor?:
   if (rarity === 'SSR') {
     next.pity = 0;
     next.srPity = 0;
+    const mrPool = banner.pool.MR ?? [];
+    const mythic = mrPool.length > 0 && (state.mrPity + 1 >= GACHA.mythicSparkAt || rng.next() < GACHA.mythicShare);
+    if (mythic) {
+      next.mrPity = 0;
+      // a Mythic does not consume the featured 50/50 or its guarantee
+      return { result: { hunterId: pick(rng, mrPool), rarity: 'MR', pityAt }, state: next };
+    }
+    next.mrPity = state.mrPity + 1;
     if (banner.kind === 'featured' && banner.featuredId) {
       const off = banner.pool.SSR.filter((id) => id !== banner.featuredId);
       const winFeatured = state.guaranteedFeatured || off.length === 0 || rng.next() < GACHA.featuredChance;
@@ -105,7 +126,7 @@ export function pullTen(state: BannerState, banner: BannerDef, rng: Rng): { resu
   for (let i = 0; i < 10; i++) {
     let floor: Rarity | undefined;
     if (i === 9) {
-      const hasSsr = results.some((r) => r.rarity === 'SSR');
+      const hasSsr = results.some((r) => r.rarity === 'SSR' || r.rarity === 'MR');
       const hasSr = results.some((r) => r.rarity !== 'R');
       if (firstBeginnerTen && !hasSsr) floor = 'SSR';
       else if (!hasSr) floor = GACHA.tenPullFloor;
@@ -128,6 +149,7 @@ const DAY = 86400000;
 const EPOCH = Date.UTC(2024, 0, 1);
 
 const fullPool = (): Record<Rarity, string[]> => ({
+  MR: byRarity('MR').map((h) => h.id),
   SSR: byRarity('SSR').map((h) => h.id),
   SR: byRarity('SR').map((h) => h.id),
   R: byRarity('R').map((h) => h.id),

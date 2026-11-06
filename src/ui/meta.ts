@@ -11,8 +11,11 @@ export const ELEMENT_COLOR: Record<Element, string> = {
 export const ELEMENT_LABEL: Record<Element, string> = {
   flame: 'Flame', frost: 'Frost', storm: 'Storm', void: 'Void', radiant: 'Radiant', rift: 'Rift',
 };
-export const RARITY_COLOR: Record<Rarity, string> = { R: '#4aa3ff', SR: '#b26bff', SSR: '#ffc23d' };
-export const RARITY_STARS: Record<Rarity, number> = { R: 3, SR: 4, SSR: 5 };
+export const RARITY_COLOR: Record<Rarity, string> = { R: '#4aa3ff', SR: '#b26bff', SSR: '#ffc23d', MR: '#ff5cf0' };
+export const RARITY_STARS: Record<Rarity, number> = { R: 3, SR: 4, SSR: 5, MR: 6 };
+export const RARITY_LABEL: Record<Rarity, string> = { R: 'R', SR: 'SR', SSR: 'SSR', MR: 'MYTHIC' };
+/** CSS rainbow used for Mythic accents */
+export const MYTHIC_GRADIENT = 'linear-gradient(90deg, #ff5c8a, #ffc23d, #5cf08a, #46c8f0, #a46bff, #ff5cf0)';
 export const CLASS_LABEL: Record<HunterClass, string> = {
   striker: 'Striker', assassin: 'Assassin', ranger: 'Ranger', mage: 'Mage', tank: 'Tank', healer: 'Healer',
 };

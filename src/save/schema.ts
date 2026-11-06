@@ -1,4 +1,4 @@
-import type { HunterElement, Rank } from '../types';
+import type { Figure, HunterElement, Rank, Rarity } from '../types';
 import { PLAYER, SAVE, STAMINA, START } from '../config/balance';
 import { emptyBannerState, type BannerState } from '../engine/gacha';
 import type { OwnedHunter } from '../engine/progression';
@@ -7,7 +7,7 @@ export interface PullRecord {
   t: number;
   banner: string;
   id: string;
-  rarity: 'R' | 'SR' | 'SSR';
+  rarity: Rarity;
   pity: number;
 }
 
@@ -29,10 +29,12 @@ export interface Settings {
   auto: boolean;
   speed2x: boolean;
   reducedMotion: 'system' | 'on' | 'off';
+  /** look of the player's own Awakened portrait */
+  avatar: Figure;
 }
 
-export interface SaveV1 {
-  version: 1;
+export interface SaveV2 {
+  version: 2;
   createdAt: number;
   lastSeenAt: number;
   seed: number;
@@ -50,12 +52,12 @@ export interface SaveV1 {
   tutorialSeen: boolean;
 }
 
-export type Save = SaveV1;
+export type Save = SaveV2;
 export const CURRENT_VERSION = SAVE.version;
 
 export function defaultSave(now = Date.now()): Save {
   return {
-    version: 1,
+    version: 2,
     createdAt: now,
     lastSeenAt: now,
     seed: (now ^ 0x5eed) >>> 0,
@@ -74,7 +76,7 @@ export function defaultSave(now = Date.now()): Save {
     gacha: { banners: { featured: emptyBannerState(), beginner: emptyBannerState() }, history: [] },
     quests: { dailyKey: '', weeklyKey: '', daily: [], weekly: null },
     stats: { gatesCleared: 0, redGatesCleared: 0, pulls: 0, playMs: 0 },
-    settings: { sound: true, haptics: true, auto: false, speed2x: false, reducedMotion: 'system' },
+    settings: { sound: true, haptics: true, auto: false, speed2x: false, reducedMotion: 'system', avatar: 'm' },
     tutorialSeen: false,
   };
 }

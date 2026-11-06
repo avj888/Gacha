@@ -10,7 +10,7 @@ import { CLASSES, CLASS_LABEL, ELEMENT_COLOR, ELEMENT_LABEL, RARITY_COLOR } from
 import type { HunterClass, HunterElement, Rarity } from '../types';
 import s from './screens.module.css';
 
-const RARITY_ORDER: Record<Rarity, number> = { SSR: 0, SR: 1, R: 2 };
+const RARITY_ORDER: Record<Rarity, number> = { MR: 0, SSR: 1, SR: 2, R: 3 };
 
 export function Roster() {
   const owned = useGame((g) => g.save.hunters);
@@ -32,8 +32,8 @@ export function Roster() {
       <ScreenHead title="Roster" backable={false} right={<button type="button" className={s.fchip} aria-pressed={false} onClick={() => navigate('team')}>Team ›</button>} />
       <div className={s.filters}>
         <div className={s.chipRow} role="group" aria-label="Rarity filter">
-          {(['SSR', 'SR', 'R'] as Rarity[]).map((r) => (
-            <button key={r} type="button" className={s.fchip} style={{ color: ra === r ? RARITY_COLOR[r] : undefined }} aria-pressed={ra === r} onClick={() => setRa(ra === r ? null : r)}>{r}</button>
+          {(['MR', 'SSR', 'SR', 'R'] as Rarity[]).map((r) => (
+            <button key={r} type="button" className={s.fchip} style={{ color: ra === r ? RARITY_COLOR[r] : undefined }} aria-pressed={ra === r} onClick={() => setRa(ra === r ? null : r)}>{r === 'MR' ? 'Mythic' : r}</button>
           ))}
           <button type="button" className={s.fchip} aria-pressed={showAll} onClick={() => setShowAll(!showAll)}>{showAll ? 'All hunters' : 'Owned'}</button>
         </div>

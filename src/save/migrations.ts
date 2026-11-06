@@ -22,6 +22,17 @@ export const MIGRATIONS: Record<number, (s: AnySave) => AnySave> = {
       version: 1,
     };
   },
+  // v1 -> v2: Mythic rarity spark counter on every banner, player avatar setting
+  1: (s) => {
+    const banners: AnySave = {};
+    for (const [id, b] of Object.entries((s.gacha?.banners ?? {}) as AnySave)) banners[id] = { mrPity: 0, ...b };
+    return {
+      ...s,
+      gacha: { ...s.gacha, banners },
+      settings: { avatar: 'm', ...s.settings },
+      version: 2,
+    };
+  },
 };
 
 export function migrate(raw: AnySave): Save {

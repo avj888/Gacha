@@ -64,6 +64,15 @@ export function Settings() {
             options={[{ value: 'system', label: 'System' }, { value: 'on', label: 'On' }, { value: 'off', label: 'Off' }]}
           />
         </div>
+        <div className={s.setRow} style={{ flexDirection: 'column', alignItems: 'stretch', padding: '10px 0', gap: 8 }}>
+          <span>Your Awakened's look</span>
+          <Segmented
+            label="Avatar"
+            value={save.settings.avatar}
+            onChange={(v) => set('avatar', v)}
+            options={[{ value: 'f', label: 'Style A (female)' }, { value: 'm', label: 'Style B (male)' }]}
+          />
+        </div>
         <div className={s.setRow}>
           <span>Hunter name</span>
           <input
