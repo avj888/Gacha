@@ -23,6 +23,63 @@ function hash(str: string) {
   return h >>> 0;
 }
 
+/** Element-specific pattern behind the silhouette. */
+function Aura({ element, c, h }: { element: Element; c: string; h: number }) {
+  const j = (k: number) => ((h >> k) % 9) - 4;
+  switch (element) {
+    case 'flame':
+      return (
+        <g fill={c} opacity=".28">
+          {[12, 30, 50, 70, 88].map((x, i) => (
+            <path key={i} d={`M${x - 8} 120 Q${x - 6 + j(i)} ${80 - i * 3} ${x + j(i + 2)} ${46 + ((i * 13) % 20)} Q${x + 6} ${82} ${x + 8} 120Z`} />
+          ))}
+        </g>
+      );
+    case 'frost':
+      return (
+        <g fill="none" stroke={c} strokeWidth="1.2" opacity=".35">
+          {[[18, 30], [82, 26], [12, 80], [88, 76], [50, 14]].map(([x, y], i) => (
+            <path key={i} d={`M${x} ${y - 8} L${x + 4} ${y} L${x} ${y + 8} L${x - 4} ${y}Z M${x} ${y - 12} V${y + 12} M${x - 9} ${y} H${x + 9}`} />
+          ))}
+        </g>
+      );
+    case 'storm':
+      return (
+        <g fill="none" stroke={c} strokeWidth="1.6" strokeLinejoin="round" opacity=".4">
+          <path d={`M14 6 L24 30 L16 32 L28 58`} />
+          <path d={`M86 10 L76 36 L84 38 L72 66`} />
+          <path d={`M50 0 L46 12 L52 14 L48 24`} strokeWidth="1" />
+        </g>
+      );
+    case 'void':
+      return (
+        <g fill="none" stroke={c} opacity=".3">
+          {[16, 28, 40, 54].map((r, i) => (
+            <circle key={r} cx="50" cy="52" r={r} strokeWidth={i % 2 ? 0.6 : 1.2} strokeDasharray={i % 2 ? '2 4' : undefined} />
+          ))}
+        </g>
+      );
+    case 'radiant':
+      return (
+        <g stroke={c} strokeWidth="1.2" opacity=".32">
+          {Array.from({ length: 12 }, (_, i) => {
+            const a = (i / 12) * Math.PI * 2;
+            return <line key={i} x1={50 + Math.cos(a) * 18} y1={46 + Math.sin(a) * 18} x2={50 + Math.cos(a) * 70} y2={46 + Math.sin(a) * 70} />;
+          })}
+        </g>
+      );
+    case 'rift':
+      return (
+        <g fill="none" stroke={c} strokeWidth=".8" opacity=".3">
+          {[0, 1, 2, 3].map((i) => (
+            <path key={i} d={`M${10 + i * 26} ${10 + (i % 2) * 8} l10 6 v12 l-10 6 l-10 -6 v-12z`} />
+          ))}
+          <path d="M8 96 L30 74 L42 84 L64 60 L92 88" strokeWidth="1.2" />
+        </g>
+      );
+  }
+}
+
 /** Class props drawn behind/around the silhouette. Coordinates in a 100x120 box. */
 function Prop({ cls, c }: { cls: UnitClass; c: string }) {
   switch (cls) {
@@ -151,6 +208,7 @@ function PortraitImpl({ id, cls, element, rarity = 'R', size = 96, frame = true,
           ))}
         </g>
         <ellipse cx="50" cy="62" rx="52" ry="58" fill={`url(#${uid}a)`} />
+        <Aura element={element} c={c} h={h} />
         <Prop cls={cls} c={c} />
         {/* body */}
         <path d={bodyPath} fill={`url(#${uid}s)`} stroke={c} strokeOpacity=".55" strokeWidth="1.2" />

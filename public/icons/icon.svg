@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="55%" r="55%">
+      <stop offset="0" stop-color="#46f0c8" stop-opacity=".55"/>
+      <stop offset=".5" stop-color="#2a5cff" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#07080f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d6fff4"/>
+      <stop offset="1" stop-color="#46f0c8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#07080f"/>
+  <circle cx="256" cy="280" r="250" fill="url(#g)"/>
+  <!-- gate arch -->
+  <path d="M136 430 V230 A120 120 0 0 1 376 230 V430" fill="none" stroke="#5a8cff" stroke-width="18" stroke-opacity=".7"/>
+  <path d="M176 430 V236 A80 80 0 0 1 336 236 V430" fill="#0b1024" stroke="#46f0c8" stroke-width="8" stroke-opacity=".6"/>
+  <!-- rift tear -->
+  <path d="M262 150 L232 250 L272 262 L238 380 L300 240 L262 230 Z" fill="url(#s)"/>
+  <path d="M120 430 H392" stroke="#46f0c8" stroke-width="10" stroke-linecap="round"/>
+</svg>

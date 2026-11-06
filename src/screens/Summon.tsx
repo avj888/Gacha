@@ -8,6 +8,7 @@ import { toast } from '../store/uiStore';
 import { Button, CrystalIcon, CurrencyBar, ElementTag, Modal, Panel, ScreenHead, Stars, useNow } from '../ui/kit';
 import { CLASS_LABEL, ELEMENT_COLOR, RARITY_COLOR, RARITY_STARS, pct } from '../ui/meta';
 import s from './screens.module.css';
+import { PullAnimation } from './PullAnimation';
 
 export function Summon() {
   const now = useNow(30_000);
@@ -144,7 +145,7 @@ export function Summon() {
         <Button block onClick={() => setInfo(null)}>Close</Button>
       </Modal>
 
-      {result ? <PullResults outcome={result} onClose={() => setResult(null)} /> : null}
+      {result ? <PullAnimation key={save.stats.pulls} outcome={result} onClose={() => setResult(null)} /> : null}
     </div>
   );
 }
@@ -158,7 +159,7 @@ export function PullResults({ outcome, onClose }: { outcome: PullOutcome; onClos
         {outcome.results.map((r, i) => {
           const h = getHunter(r.hunterId);
           return (
-            <div key={i} className={s.resultCell} style={{ animationDelay: `${i * 60}ms` }}>
+            <div key={i} className={s.resultCell} data-rarity={r.rarity} style={{ animationDelay: `${i * 70}ms` }}>
               <Portrait id={h.id} cls={h.cls} element={h.element} rarity={r.rarity} size={single ? 160 : 70} />
               {r.kind === 'new' ? <span className={s.newTag}>NEW</span> : r.kind === 'star' ? <span className={s.starTag}>+★</span> : null}
               <span className={s.resultName} style={{ color: RARITY_COLOR[r.rarity] }}>{h.name.split(' ')[0]}</span>

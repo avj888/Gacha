@@ -15,6 +15,8 @@ import { Quests } from './screens/Quests';
 import { HunterUpgrade } from './screens/HunterUpgrade';
 import { questsClaimable, trialAvailable } from './engine/game';
 import './store/battleFlow';
+import { setSoundEnabled, unlockAudio } from './audio/sfx';
+import { setHapticsEnabled } from './fx/haptics';
 
 const NAV: { name: RouteName; label: string; icon: ReactNode }[] = [
   { name: 'home', label: 'HOME', icon: <path d="M3 11 L12 3 L21 11 V21 H14 V15 H10 V21 H3Z" /> },
@@ -47,6 +49,15 @@ export default function App() {
   const route = useRoute();
   const motion = useGame((g) => g.save.settings.reducedMotion);
   const tick = useGame((g) => g.tick);
+  const sound = useGame((g) => g.save.settings.sound);
+  const haptics = useGame((g) => g.save.settings.haptics);
+  useEffect(() => setSoundEnabled(sound), [sound]);
+  useEffect(() => setHapticsEnabled(haptics), [haptics]);
+  useEffect(() => {
+    const unlock = () => unlockAudio();
+    window.addEventListener('pointerdown', unlock, { passive: true });
+    return () => window.removeEventListener('pointerdown', unlock);
+  }, []);
 
   useEffect(() => {
     tick();

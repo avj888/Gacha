@@ -63,6 +63,10 @@
 .resultGrid.single { grid-template-columns: 1fr; max-width: 180px; }
 .resultCell { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; animation: pop .4s var(--ease) both; }
 .resultCell svg { width: 100%; height: auto; }
+.resultCell[data-rarity='SSR'] svg { filter: drop-shadow(0 0 10px rgba(255, 194, 61, .85)); }
+.resultCell[data-rarity='SR'] svg { filter: drop-shadow(0 0 8px rgba(178, 107, 255, .7)); }
+.resultCell[data-rarity='SSR'] { animation: popBig .6s var(--ease) both; }
+@keyframes popBig { 0% { opacity: 0; transform: scale(1.8); filter: brightness(3); } 100% { opacity: 1; transform: scale(1); filter: none; } }
 .resultName { font-size: 10px; text-align: center; line-height: 1.15; color: var(--text-dim); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .newTag { position: absolute; top: -4px; right: -2px; font-size: 9px; font-weight: 800; padding: 2px 4px; border-radius: 4px; background: var(--danger); color: #fff; letter-spacing: .04em; }
 .starTag { position: absolute; top: -4px; right: -2px; font-size: 9px; font-weight: 800; padding: 2px 4px; border-radius: 4px; background: var(--gold); color: #1e1200; }
