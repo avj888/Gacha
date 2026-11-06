@@ -390,7 +390,161 @@ const R: Spec[] = [
   },
 ];
 
-export const HUNTERS: HunterDef[] = [...SSR, ...SR, ...R].map(make);
+// =========================================================== Wave 2 (roster expansion)
+const SSR2: Spec[] = [
+  {
+    id: 'ssr-ingrid', name: 'Ingrid Emberlane', title: 'The Last Furnace', rarity: 'SSR', cls: 'mage', element: 'flame',
+    bio: 'Ran the city’s last coal furnace. When the Rift came through the boiler room, she breathed it in.',
+    kit: {
+      basic: ab('Cinder Script', 'Deal 100% ATK to one enemy.', [dmg(1.0)]),
+      skill: ab('Stokehold', '140% ATK to all enemies and burn them for 2 turns.', [dmg(1.4, 'allEnemies'), dot(0.35, 'allEnemies')], 3),
+      ultimate: ab('Last Furnace', '300% ATK to all enemies, +40% vs debuffed, then +20% ATK for 2 turns.', [dmg(3.0, 'allEnemies', { bonusVsDebuffed: 0.4 }), buff('atk', 0.2, 'self')]),
+      passives: [
+        pas('Banked Coals', '+12% ATK.', { stats: { atk: 0.12 } }),
+        pas('Heat Haze', 'Team gains +6% ATK.', { teamStats: { atk: 0.06 } }),
+        pas('White Furnace', '+15% ATK, start with 35 energy.', { stats: { atk: 0.15 }, startEnergy: 35 }),
+      ],
+    },
+  },
+  {
+    id: 'ssr-teodor', name: 'Teodor Halcyon', title: 'Dawnstring', rarity: 'SSR', cls: 'ranger', element: 'radiant',
+    bio: 'A bell-ringer who strung his bow with wire from the cathedral tower. Every shot sounds like morning.',
+    kit: {
+      basic: ab('Matins', 'Deal 105% ATK to one enemy.', [dmg(1.05)]),
+      skill: ab('Peal', '4 hits of 65% ATK on random enemies; team gains +10% SPD for 2 turns.', [dmg(0.65, 'randomEnemies', { hits: 4 }), buff('spd', 0.1, 'allAllies')], 3),
+      ultimate: ab('Daybreak Volley', '380% ATK to one enemy, ignoring 25% DEF, and give the team 15 energy.', [dmg(3.8, 'enemy', { ignoreDef: 0.25 }), energy(15, 'allAllies')]),
+      passives: [
+        pas('Tower Sight', '+10% Crit Rate.', { stats: { critRate: 0.1 } }),
+        pas('First Bell', 'Team gains +5% SPD.', { teamStats: { spd: 0.05 } }),
+        pas('High Noon', '+15% ATK, +20% Crit DMG.', { stats: { atk: 0.15, critDmg: 0.2 } }),
+      ],
+    },
+  },
+];
+
+const SR2: Spec[] = [
+  {
+    id: 'sr-mara', name: 'Mara Quillon', title: 'Nullfist', rarity: 'SR', cls: 'striker', element: 'void',
+    bio: 'An amateur boxer whose punches now land a half-second before she throws them.',
+    kit: {
+      basic: ab('Jab Before Time', '110% ATK to one enemy.', [dmg(1.1)]),
+      skill: ab('Hollow Hook', '170% ATK to one enemy and lower its DEF by 20%.', [dmg(1.7), debuff('def', 0.2, 'enemy')], 3),
+      ultimate: ab('Count of Zero', '340% ATK to one enemy, +35% vs debuffed.', [dmg(3.4, 'enemy', { bonusVsDebuffed: 0.35 })]),
+      passives: [
+        pas('Footwork', '+8% SPD.', { stats: { spd: 0.08 } }),
+        pas('Second Wind', 'Start with 25 energy.', { startEnergy: 25 }),
+        pas('Title Shot', '+15% ATK.', { stats: { atk: 0.15 } }),
+      ],
+    },
+  },
+  {
+    id: 'sr-kip', name: 'Kip Ravensworth', title: 'Static Knife', rarity: 'SR', cls: 'assassin', element: 'storm',
+    bio: 'A bike messenger who rides the power lines. Nobody has ever outrun him, and plenty have tried.',
+    kit: {
+      basic: ab('Spark Slash', '100% ATK to one enemy.', [dmg(1.0)]),
+      skill: ab('Live Rail', '180% ATK to one enemy, 40% chance to stun.', [dmg(1.8), stun(0.4)], 3),
+      ultimate: ab('Blackout Run', '3 hits of 130% ATK on random enemies.', [dmg(1.3, 'randomEnemies', { hits: 3 })]),
+      passives: [
+        pas('Tailwind', '+10% SPD.', { stats: { spd: 0.1 } }),
+        pas('Close Call', '+10% Crit Rate.', { stats: { critRate: 0.1 } }),
+        pas('Rush Hour', '+15% ATK.', { stats: { atk: 0.15 } }),
+      ],
+    },
+  },
+  {
+    id: 'sr-augustin', name: 'Augustin Brask', title: 'Kiln Wall', rarity: 'SR', cls: 'tank', element: 'flame',
+    bio: 'A potter with hands like oven mitts. He fires his own armour, one brick-red plate at a time.',
+    kit: {
+      basic: ab('Clay Slam', '90% ATK to one enemy.', [dmg(0.9)]),
+      skill: ab('Glaze', 'Taunt for 2 turns and shield self for 22% max HP.', [taunt(2), shield(0.22, 'self')], 3),
+      ultimate: ab('Firing', '150% ATK to all enemies and burn them; team gains +15% DEF.', [dmg(1.5, 'allEnemies'), dot(0.3, 'allEnemies'), buff('def', 0.15, 'allAllies')]),
+      passives: [
+        pas('Thick Walls', '+12% DEF.', { stats: { def: 0.12 } }),
+        pas('Hearth', 'Team gains +6% HP.', { teamStats: { hp: 0.06 } }),
+        pas('Stoneware', '+15% HP, +10% DEF.', { stats: { hp: 0.15, def: 0.1 } }),
+      ],
+    },
+  },
+  {
+    id: 'sr-elodie', name: 'Elodie Marsh', title: 'Winter Nurse', rarity: 'SR', cls: 'healer', element: 'frost',
+    bio: 'Packs wounds in Rift-ice that never melts. Her patients wake up cold, but they wake up.',
+    kit: {
+      basic: ab('Chill Touch', '90% ATK to one enemy.', [dmg(0.9)]),
+      skill: ab('Cold Compress', 'Heal the weakest ally for 200% ATK and shield them for 10% max HP.', [heal(2.0, 'lowestAlly'), shield(0.1, 'lowestAlly')], 2),
+      ultimate: ab('Long Frost', 'Heal all allies for 150% ATK and lower enemy SPD by 15%.', [heal(1.5, 'allAllies'), debuff('spd', 0.15, 'allEnemies')]),
+      passives: [
+        pas('Steady Hands', '+10% HP.', { stats: { hp: 0.1 } }),
+        pas('Bedside Manner', 'Team gains +5% DEF.', { teamStats: { def: 0.05 } }),
+        pas('Cryo Ward', '+15% ATK, start with 25 energy.', { stats: { atk: 0.15 }, startEnergy: 25 }),
+      ],
+    },
+  },
+];
+
+const R2: Spec[] = [
+  {
+    id: 'r-benny', name: 'Benny Ortolan', title: 'Neon Bouncer', rarity: 'R', cls: 'striker', element: 'radiant',
+    bio: 'Works the door at a club that glows a little too brightly. Gate-beasts are not on the list.',
+    kit: {
+      basic: ab('Velvet Rope', '105% ATK to one enemy.', [dmg(1.05)]),
+      skill: ab('Lights Up', '160% ATK to one enemy and lower its ATK by 15%.', [dmg(1.6), debuff('atk', 0.15, 'enemy')], 3),
+      ultimate: ab('Closing Time', '270% ATK to one enemy.', [dmg(2.7)]),
+      passives: rp('Big Frame', 'Door Policy', 'Last Call'),
+    },
+  },
+  {
+    id: 'r-juno', name: 'Juno Sallow', title: 'Glint', rarity: 'R', cls: 'assassin', element: 'radiant',
+    bio: 'A pickpocket who learned to steal light. Now she hides inside the glare of streetlamps.',
+    kit: {
+      basic: ab('Flash Cut', '100% ATK to one enemy.', [dmg(1.0)]),
+      skill: ab('Glare', '170% ATK to one enemy, ignoring 20% DEF.', [dmg(1.7, 'enemy', { ignoreDef: 0.2 })], 3),
+      ultimate: ab('Blindside', '290% ATK to one enemy, +30% vs debuffed.', [dmg(2.9, 'enemy', { bonusVsDebuffed: 0.3 })]),
+      passives: rp('Quick Fingers', 'Shine', 'Vanishing Act'),
+    },
+  },
+  {
+    id: 'r-dorrit', name: 'Dorrit Vale', title: 'Lightning Rod', rarity: 'R', cls: 'tank', element: 'storm',
+    bio: 'A roofer who has been struck nine times. She now climbs up during storms on purpose.',
+    kit: {
+      basic: ab('Ground Out', '90% ATK to one enemy.', [dmg(0.9)]),
+      skill: ab('Draw Fire', 'Taunt for 2 turns and gain +25% DEF.', [taunt(2), buff('def', 0.25, 'self')], 3),
+      ultimate: ab('Earth Wire', '130% ATK to all enemies, 25% chance to stun.', [dmg(1.3, 'allEnemies'), stun(0.25, 'allEnemies')]),
+      passives: rpTank('Rubber Boots', 'Weathered', 'Struck Ten'),
+    },
+  },
+  {
+    id: 'r-pell', name: 'Pell Haverty', title: 'Jumpstart', rarity: 'R', cls: 'healer', element: 'storm',
+    bio: 'An ambulance mechanic who discovered the defibrillator works on hunters, too. Mostly.',
+    kit: {
+      basic: ab('Zap Check', '90% ATK to one enemy.', [dmg(0.9)]),
+      skill: ab('Clear!', 'Heal the weakest ally for 180% ATK and give them 20 energy.', [heal(1.8, 'lowestAlly'), energy(20, 'lowestAlly')], 3),
+      ultimate: ab('Full Charge', 'Heal all allies for 130% ATK and grant 15 energy.', [heal(1.3, 'allAllies'), energy(15, 'allAllies')]),
+      passives: rpHeal('Spare Battery', 'Jumper Cables', 'Overcharge'),
+    },
+  },
+  {
+    id: 'r-wynn', name: 'Wynn Calder', title: 'Margin Note', rarity: 'R', cls: 'mage', element: 'void',
+    bio: 'A night-shift archivist who reads the blank pages in old books. Something reads back.',
+    kit: {
+      basic: ab('Ink Blot', '100% ATK to one enemy.', [dmg(1.0)]),
+      skill: ab('Redact', '110% ATK to all enemies and lower DEF by 15%.', [dmg(1.1, 'allEnemies'), debuff('def', 0.15, 'allEnemies')], 3),
+      ultimate: ab('Unwritten', '200% ATK to all enemies.', [dmg(2.0, 'allEnemies')]),
+      passives: rp('Late Return', 'Quiet Hours', 'Final Draft'),
+    },
+  },
+  {
+    id: 'r-ossie', name: 'Ossie Brandt', title: 'Flare Gun', rarity: 'R', cls: 'ranger', element: 'flame',
+    bio: 'Harbour coast-guard volunteer. Fires distress flares at Rift-things and is surprised how well it works.',
+    kit: {
+      basic: ab('Signal Shot', '100% ATK to one enemy.', [dmg(1.0)]),
+      skill: ab('Mayday', '2 hits of 90% ATK on random enemies; each may burn.', [dmg(0.9, 'randomEnemies', { hits: 2 }), dot(0.3, 'enemy', 2, 0.5)], 2),
+      ultimate: ab('Red Sky', '180% ATK to all enemies.', [dmg(1.8, 'allEnemies')]),
+      passives: rp('Sea Legs', 'Weatherproof', 'Bright Night'),
+    },
+  },
+];
+
+export const HUNTERS: HunterDef[] = [...SSR, ...SSR2, ...SR, ...SR2, ...R, ...R2].map(make);
 export const HUNTER_MAP: Record<string, HunterDef> = Object.fromEntries(HUNTERS.map((h) => [h.id, h]));
 export const getHunter = (id: string): HunterDef => {
   const h = HUNTER_MAP[id];

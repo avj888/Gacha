@@ -62,7 +62,7 @@ node scripts/make-icons.mjs   # regenerate PNG icons from public/icons/icon.svg
 
 ```
 src/config/balance.ts   every tunable number
-src/data/               hunters (24), enemies, gates (60), trials, quests, player kit
+src/data/               hunters (36), enemies, gates (60), trials, quests, player kit
 src/engine/             pure TS: gacha, battle/, progression, stamina, game rules, team builder, rng
 src/save/               versioned schema, migrations, export/import (base64 + checksum)
 src/store/              Zustand game store (debounced persistence), battle session, router, flow

@@ -15,14 +15,15 @@ const T = Date.UTC(2026, 0, 5, 12);
 const won = (): BattleState => ({ ...createBattle({ allies: [], waves: [[]], seed: 1 }).state, outcome: 'win', elapsed: 500 });
 
 describe('roster', () => {
-  it('has 24 hunters: 4 SSR, 8 SR, 12 R; every class and element represented', () => {
-    expect(HUNTERS).toHaveLength(24);
-    expect(HUNTERS.filter((h) => h.rarity === 'SSR')).toHaveLength(4);
-    expect(HUNTERS.filter((h) => h.rarity === 'SR')).toHaveLength(8);
-    expect(HUNTERS.filter((h) => h.rarity === 'R')).toHaveLength(12);
-    for (const c of ['striker', 'assassin', 'ranger', 'mage', 'tank', 'healer']) expect(HUNTERS.filter((h) => h.cls === c)).toHaveLength(4);
-    for (const e of ['flame', 'frost', 'storm', 'void', 'radiant']) expect(HUNTERS.some((h) => h.element === e)).toBe(true);
-    expect(new Set(HUNTERS.map((h) => h.id)).size).toBe(24);
+  it('has 36 hunters: 6 SSR, 12 SR, 18 R; every class and element represented', () => {
+    expect(HUNTERS).toHaveLength(36);
+    expect(HUNTERS.filter((h) => h.rarity === 'SSR')).toHaveLength(6);
+    expect(HUNTERS.filter((h) => h.rarity === 'SR')).toHaveLength(12);
+    expect(HUNTERS.filter((h) => h.rarity === 'R')).toHaveLength(18);
+    for (const c of ['striker', 'assassin', 'ranger', 'mage', 'tank', 'healer']) expect(HUNTERS.filter((h) => h.cls === c)).toHaveLength(6);
+    for (const e of ['flame', 'frost', 'storm', 'void', 'radiant']) expect(HUNTERS.filter((h) => h.element === e).length).toBeGreaterThanOrEqual(6);
+    expect(new Set(HUNTERS.map((h) => h.id)).size).toBe(36);
+    expect(new Set(HUNTERS.map((h) => h.name)).size).toBe(36);
   });
   it('has 60 gates, 10 per tier', () => {
     expect(GATE_LIST).toHaveLength(60);
